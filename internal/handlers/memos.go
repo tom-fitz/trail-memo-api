@@ -76,30 +76,42 @@ func (h *MemoHandler) Create(c *gin.Context) {
 		return
 	}
 
-	// Get audio file
+	// Get audio file (optional for MVP)
 	audioFile, err := c.FormFile("audio")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": gin.H{
-				"code":    "VALIDATION_ERROR",
-				"message": "Audio file is required",
-			},
-		})
-		return
-	}
+	var audioURL string
 
-	// Check file size
-	if audioFile.Size > h.maxUploadSize {
-		c.JSON(http.StatusRequestEntityTooLarge, gin.H{
-			"error": gin.H{
-				"code":    "VALIDATION_ERROR",
-				"message": "File size exceeds maximum allowed size",
-				"details": gin.H{
-					"max_size_mb": h.maxUploadSize / (1024 * 1024),
+	if err == nil {
+		// Audio file provided - validate size
+		if audioFile.Size > h.maxUploadSize {
+			c.JSON(http.StatusRequestEntityTooLarge, gin.H{
+				"error": gin.H{
+					"code":    "VALIDATION_ERROR",
+					"message": "File size exceeds maximum allowed size",
+					"details": gin.H{
+						"max_size_mb": h.maxUploadSize / (1024 * 1024),
+					},
 				},
-			},
-		})
-		return
+			})
+			return
+		}
+
+		// Upload audio file to Firebase Storage
+		audioURL, err = h.firebaseService.UploadAudioFile(c.Request.Context(), audioFile, userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": gin.H{
+					"code":    "INTERNAL_ERROR",
+					"message": "Error uploading audio file",
+					"details": gin.H{
+						"reason": err.Error(),
+					},
+				},
+			})
+			return
+		}
+	} else {
+		// No audio file provided - use placeholder for MVP
+		audioURL = "https://placeholder.com/audio.m4a"
 	}
 
 	// Parse form data
@@ -109,21 +121,6 @@ func (h *MemoHandler) Create(c *gin.Context) {
 			"error": gin.H{
 				"code":    "VALIDATION_ERROR",
 				"message": "Invalid form data",
-				"details": gin.H{
-					"reason": err.Error(),
-				},
-			},
-		})
-		return
-	}
-
-	// Upload audio file to Firebase Storage
-	audioURL, err := h.firebaseService.UploadAudioFile(c.Request.Context(), audioFile, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"code":    "INTERNAL_ERROR",
-				"message": "Error uploading audio file",
 				"details": gin.H{
 					"reason": err.Error(),
 				},
