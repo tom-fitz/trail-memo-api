@@ -16,44 +16,44 @@ type Location struct {
 
 // Memo represents a voice memo
 type Memo struct {
-	MemoID          uuid.UUID  `json:"memo_id" db:"memo_id"`
-	UserID          string     `json:"user_id" db:"user_id"`
-	UserName        string     `json:"user_name" db:"user_name"`
-	Title           *string    `json:"title" db:"title"`
-	AudioURL        string     `json:"audio_url" db:"audio_url"`
-	Text            string     `json:"text" db:"text"`
-	DurationSeconds int        `json:"duration_seconds" db:"duration_seconds"`
-	Latitude        *float64   `json:"-" db:"latitude"`
-	Longitude       *float64   `json:"-" db:"longitude"`
+	MemoID           uuid.UUID `json:"memo_id" db:"memo_id"`
+	UserID           string    `json:"user_id" db:"user_id"`
+	UserName         string    `json:"user_name" db:"user_name"`
+	Title            *string   `json:"title" db:"title"`
+	AudioURL         string    `json:"audio_url" db:"audio_url"`
+	Text             string    `json:"text" db:"text"`
+	DurationSeconds  int       `json:"duration_seconds" db:"duration_seconds"`
+	Latitude         *float64  `json:"-" db:"latitude"`
+	Longitude        *float64  `json:"-" db:"longitude"`
 	LocationAccuracy *float64  `json:"-" db:"location_accuracy"`
-	Address         *string    `json:"-" db:"address"`
-	ParkName        *string    `json:"park_name" db:"park_name"`
-	CreatedAt       time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at" db:"updated_at"`
-	Location        *Location  `json:"location,omitempty" db:"-"`
+	Address          *string   `json:"-" db:"address"`
+	ParkName         *string   `json:"park_name" db:"park_name"`
+	CreatedAt        time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
+	Location         *Location `json:"location,omitempty" db:"-"`
 }
 
 // MemoListItem represents a memo in list views
 type MemoListItem struct {
-	MemoID          uuid.UUID  `json:"memo_id"`
-	UserID          string     `json:"user_id"`
-	UserName        string     `json:"user_name"`
-	Title           *string    `json:"title"`
-	AudioURL        string     `json:"audio_url"`
-	Text            string     `json:"text"`
-	DurationSeconds int        `json:"duration_seconds"`
-	Location        *Location  `json:"location,omitempty"`
-	ParkName        *string    `json:"park_name"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	MemoID          uuid.UUID `json:"memo_id"`
+	UserID          string    `json:"user_id"`
+	UserName        string    `json:"user_name"`
+	Title           *string   `json:"title"`
+	AudioURL        string    `json:"audio_url"`
+	Text            string    `json:"text"`
+	DurationSeconds int       `json:"duration_seconds"`
+	Location        *Location `json:"location,omitempty"`
+	ParkName        *string   `json:"park_name"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
 
 // CreateMemoRequest represents the request to create a memo
 type CreateMemoRequest struct {
 	Text             string   `form:"text" binding:"required"`
 	DurationSeconds  int      `form:"duration_seconds" binding:"required"`
-	Latitude         *float64 `form:"latitude"`
-	Longitude        *float64 `form:"longitude"`
+	Latitude         float64  `form:"latitude" binding:"required"`
+	Longitude        float64  `form:"longitude" binding:"required"`
 	LocationAccuracy *float64 `form:"location_accuracy"`
 	ParkName         *string  `form:"park_name"`
 	Title            *string  `form:"title"`
@@ -91,13 +91,13 @@ type SearchResponse struct {
 
 // NearbyMemo represents a memo with distance info
 type NearbyMemo struct {
-	MemoID         uuid.UUID  `json:"memo_id"`
-	UserName       string     `json:"user_name"`
-	Title          *string    `json:"title"`
-	ParkName       *string    `json:"park_name"`
-	Location       *Location  `json:"location"`
-	DistanceMeters float64    `json:"distance_meters"`
-	CreatedAt      time.Time  `json:"created_at"`
+	MemoID         uuid.UUID `json:"memo_id"`
+	UserName       string    `json:"user_name"`
+	Title          *string   `json:"title"`
+	ParkName       *string   `json:"park_name"`
+	Location       *Location `json:"location"`
+	DistanceMeters float64   `json:"distance_meters"`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 // NearbyMemosResponse represents nearby memos response
@@ -119,4 +119,3 @@ type ErrorDetail struct {
 	Message string                 `json:"message"`
 	Details map[string]interface{} `json:"details,omitempty"`
 }
-

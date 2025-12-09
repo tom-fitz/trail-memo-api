@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for local development
+  postgres:
+    image: postgres:15-alpine
+    container_name: trailmemo-postgres-dev
+    environment:
+      POSTGRES_USER: trailmemo
+      POSTGRES_PASSWORD: trailmemo_dev_password
+      POSTGRES_DB: trailmemo_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trailmemo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # pgAdmin for database management (optional but useful)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: trailmemo-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@trailmemo.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+

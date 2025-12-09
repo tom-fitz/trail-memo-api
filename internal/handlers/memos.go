@@ -137,8 +137,8 @@ func (h *MemoHandler) Create(c *gin.Context) {
 		AudioURL:         audioURL,
 		Text:             req.Text,
 		DurationSeconds:  req.DurationSeconds,
-		Latitude:         req.Latitude,
-		Longitude:        req.Longitude,
+		Latitude:         &req.Latitude,
+		Longitude:        &req.Longitude,
 		LocationAccuracy: req.LocationAccuracy,
 		ParkName:         req.ParkName,
 	}
@@ -156,14 +156,12 @@ func (h *MemoHandler) Create(c *gin.Context) {
 		return
 	}
 
-	// Build location object if coordinates exist
-	if memo.Latitude != nil && memo.Longitude != nil {
-		memo.Location = &models.Location{
-			Latitude:  *memo.Latitude,
-			Longitude: *memo.Longitude,
-			Accuracy:  memo.LocationAccuracy,
-			Address:   memo.Address,
-		}
+	// Build location object (always present now since required)
+	memo.Location = &models.Location{
+		Latitude:  *memo.Latitude,
+		Longitude: *memo.Longitude,
+		Accuracy:  memo.LocationAccuracy,
+		Address:   memo.Address,
 	}
 
 	c.JSON(http.StatusCreated, memo)

@@ -38,7 +38,7 @@ func Load() *Config {
 	return &Config{
 		Port:                       getEnv("PORT", "8080"),
 		Environment:                getEnv("ENV", "development"),
-		DatabaseURL:                getEnv("DATABASE_PUBLIC_URL", ""),
+		DatabaseURL:                getEnv("DATABASE_URL", ""),
 		FirebaseProjectID:          getEnv("FIREBASE_PROJECT_ID", ""),
 		FirebaseStorageBucket:      getEnv("FIREBASE_STORAGE_BUCKET", ""),
 		FirebaseServiceAccountPath: getEnv("FIREBASE_SERVICE_ACCOUNT_PATH", ""),
