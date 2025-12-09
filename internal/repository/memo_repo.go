@@ -338,22 +338,28 @@ func (r *MemoRepository) SearchByText(ctx context.Context, query string, page, l
 
 // GetNearby finds memos near a location using Haversine formula
 func (r *MemoRepository) GetNearby(ctx context.Context, lat, lon float64, radiusMeters, limit int) ([]models.NearbyMemo, error) {
-	// Haversine formula in SQL
+	// Haversine formula in SQL - use subquery to filter by distance
 	query := `
 		SELECT 
 			memo_id, user_name, title, park_name,
 			latitude, longitude, location_accuracy, address,
-			created_at,
-			(
-				6371000 * acos(
-					cos(radians($1)) * cos(radians(latitude)) *
-					cos(radians(longitude) - radians($2)) +
-					sin(radians($1)) * sin(radians(latitude))
-				)
-			) AS distance_meters
-		FROM memos
-		WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-		HAVING distance_meters <= $3
+			created_at, distance_meters
+		FROM (
+			SELECT 
+				memo_id, user_name, title, park_name,
+				latitude, longitude, location_accuracy, address,
+				created_at,
+				(
+					6371000 * acos(
+						cos(radians($1)) * cos(radians(latitude)) *
+						cos(radians(longitude) - radians($2)) +
+						sin(radians($1)) * sin(radians(latitude))
+					)
+				) AS distance_meters
+			FROM memos
+			WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+		) AS nearby
+		WHERE distance_meters <= $3
 		ORDER BY distance_meters ASC
 		LIMIT $4
 	`
