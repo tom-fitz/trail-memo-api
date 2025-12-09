@@ -61,9 +61,11 @@ type CreateMemoRequest struct {
 
 // UpdateMemoRequest represents the request to update a memo
 type UpdateMemoRequest struct {
-	Title    *string `json:"title"`
-	Text     *string `json:"text"`
-	ParkName *string `json:"park_name"`
+	Title     *string  `json:"title"`
+	Text      *string  `json:"text"`
+	ParkName  *string  `json:"park_name"`
+	Latitude  *float64 `json:"latitude,omitempty"`
+	Longitude *float64 `json:"longitude,omitempty"`
 }
 
 // PaginationResponse represents pagination metadata

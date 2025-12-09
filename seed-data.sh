@@ -84,7 +84,7 @@ LOCATIONS=(
 
 # Create memos
 COUNT=0
-TOTAL=30
+TOTAL=10
 
 echo "Creating $TOTAL memos..."
 

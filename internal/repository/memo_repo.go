@@ -216,6 +216,18 @@ func (r *MemoRepository) Update(ctx context.Context, memoID uuid.UUID, updates m
 		argPos++
 	}
 
+	if latitude, ok := updates["latitude"]; ok {
+		setClauses = append(setClauses, fmt.Sprintf("latitude = $%d", argPos))
+		args = append(args, latitude)
+		argPos++
+	}
+
+	if longitude, ok := updates["longitude"]; ok {
+		setClauses = append(setClauses, fmt.Sprintf("longitude = $%d", argPos))
+		args = append(args, longitude)
+		argPos++
+	}
+
 	if len(setClauses) == 0 {
 		return nil, fmt.Errorf("no fields to update")
 	}

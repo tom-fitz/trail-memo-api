@@ -351,6 +351,12 @@ func (h *MemoHandler) Update(c *gin.Context) {
 	if req.ParkName != nil {
 		updates["park_name"] = req.ParkName
 	}
+	if req.Latitude != nil {
+		updates["latitude"] = req.Latitude
+	}
+	if req.Longitude != nil {
+		updates["longitude"] = req.Longitude
+	}
 
 	if len(updates) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
