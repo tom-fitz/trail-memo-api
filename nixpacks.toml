@@ -1,0 +1,10 @@
+# Nixpacks configuration for Railway
+[phases.setup]
+nixPkgs = ["go_1_21"]
+
+[phases.build]
+cmds = ["go build -o main ./cmd/server/main.go"]
+
+[start]
+cmd = "./main"
+
