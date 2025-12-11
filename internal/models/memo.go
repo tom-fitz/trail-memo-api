@@ -19,6 +19,7 @@ type Memo struct {
 	MemoID           uuid.UUID `json:"memo_id" db:"memo_id"`
 	UserID           string    `json:"user_id" db:"user_id"`
 	UserName         string    `json:"user_name" db:"user_name"`
+	UserColor        string    `json:"user_color" db:"user_color"`
 	Title            *string   `json:"title" db:"title"`
 	AudioURL         string    `json:"audio_url" db:"audio_url"`
 	Text             string    `json:"text" db:"text"`
@@ -38,6 +39,7 @@ type MemoListItem struct {
 	MemoID          uuid.UUID `json:"memo_id"`
 	UserID          string    `json:"user_id"`
 	UserName        string    `json:"user_name"`
+	UserColor       string    `json:"user_color"`
 	Title           *string   `json:"title"`
 	AudioURL        string    `json:"audio_url"`
 	Text            string    `json:"text"`
@@ -95,6 +97,7 @@ type SearchResponse struct {
 type NearbyMemo struct {
 	MemoID         uuid.UUID `json:"memo_id"`
 	UserName       string    `json:"user_name"`
+	UserColor      string    `json:"user_color"`
 	Title          *string   `json:"title"`
 	ParkName       *string   `json:"park_name"`
 	Location       *Location `json:"location"`

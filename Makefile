@@ -26,11 +26,17 @@ clean: ## Clean build artifacts
 	rm -rf dist/
 
 migrate: ## Run database migrations
-	@if [ -z "$(DATABASE_URL)" ]; then \
+	@if [ -z "$(DATABASE_PUBLIC_URL)" ]; then \
 		echo "Error: DATABASE_URL environment variable is not set"; \
 		exit 1; \
 	fi
-	psql $(DATABASE_URL) -f migrations/001_init.sql
+	@echo "DATABASE_URL: $(DATABASE_PUBLIC_URL)"
+	@echo "🗄️  Running database migrations..."
+	@for file in migrations/*.sql; do \
+		echo "  📄 Applying $$file..."; \
+		psql $(DATABASE_PUBLIC_URL) -f $$file || exit 1; \
+	done
+	@echo "✅ All migrations applied successfully!"
 
 docker-build: ## Build Docker image
 	docker build -t trailmemo-api .

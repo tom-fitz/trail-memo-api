@@ -8,6 +8,7 @@ import (
 	"github.com/tom-fitz/trailmemo-api/internal/models"
 	"github.com/tom-fitz/trailmemo-api/internal/repository"
 	"github.com/tom-fitz/trailmemo-api/internal/services"
+	"github.com/tom-fitz/trailmemo-api/internal/utils"
 )
 
 // AuthHandler handles authentication-related requests
@@ -94,6 +95,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Email:       firebaseUser.Email,
 		DisplayName: req.DisplayName,
 		Department:  req.Department,
+		Color:       utils.GenerateUserColor(userID),
 	}
 
 	if err := h.userRepo.Create(c.Request.Context(), user); err != nil {

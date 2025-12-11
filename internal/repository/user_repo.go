@@ -22,8 +22,8 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 // Create creates a new user
 func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 	query := `
-		INSERT INTO users (user_id, email, display_name, department)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO users (user_id, email, display_name, department, color)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING created_at
 	`
 
@@ -34,6 +34,7 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 		user.Email,
 		user.DisplayName,
 		user.Department,
+		user.Color,
 	).Scan(&user.CreatedAt)
 
 	if err != nil {
@@ -47,7 +48,7 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 func (r *UserRepository) GetByID(ctx context.Context, userID string) (*models.User, error) {
 	var user models.User
 	query := `
-		SELECT user_id, email, display_name, department, created_at
+		SELECT user_id, email, display_name, department, color, created_at
 		FROM users
 		WHERE user_id = $1
 	`
@@ -67,7 +68,7 @@ func (r *UserRepository) GetByID(ctx context.Context, userID string) (*models.Us
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 	query := `
-		SELECT user_id, email, display_name, department, created_at
+		SELECT user_id, email, display_name, department, color, created_at
 		FROM users
 		WHERE email = $1
 	`

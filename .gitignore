@@ -9,6 +9,10 @@
 serviceAccountKey.json
 trail-memo-firebase-adminsdk.json
 
+# Local dev scripts with secrets
+refresh-token.sh
+decode-token.sh
+
 # Go build artifacts
 *.exe
 *.exe~

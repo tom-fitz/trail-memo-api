@@ -8,6 +8,7 @@ type User struct {
 	Email       string    `json:"email" db:"email"`
 	DisplayName string    `json:"display_name" db:"display_name"`
 	Department  string    `json:"department" db:"department"`
+	Color       string    `json:"color" db:"color"` // Hex color code (e.g., #FF5733)
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -16,4 +17,3 @@ type CreateUserRequest struct {
 	DisplayName string `json:"display_name" binding:"required"`
 	Department  string `json:"department"`
 }
-

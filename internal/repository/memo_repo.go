@@ -26,10 +26,10 @@ func NewMemoRepository(db *sqlx.DB) *MemoRepository {
 func (r *MemoRepository) Create(ctx context.Context, memo *models.Memo) error {
 	query := `
 		INSERT INTO memos (
-			user_id, user_name, title, audio_url, text, duration_seconds,
+			user_id, user_name, user_color, title, audio_url, text, duration_seconds,
 			latitude, longitude, location_accuracy, address, park_name
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING memo_id, created_at, updated_at
 	`
 
@@ -38,6 +38,7 @@ func (r *MemoRepository) Create(ctx context.Context, memo *models.Memo) error {
 		query,
 		memo.UserID,
 		memo.UserName,
+		memo.UserColor,
 		memo.Title,
 		memo.AudioURL,
 		memo.Text,
@@ -61,7 +62,7 @@ func (r *MemoRepository) GetByID(ctx context.Context, memoID uuid.UUID) (*models
 	var memo models.Memo
 	query := `
 		SELECT 
-			memo_id, user_id, user_name, title, audio_url, text, duration_seconds,
+			memo_id, user_id, user_name, user_color, title, audio_url, text, duration_seconds,
 			latitude, longitude, location_accuracy, address, park_name,
 			created_at, updated_at
 		FROM memos
@@ -139,7 +140,7 @@ func (r *MemoRepository) List(ctx context.Context, page, limit int, filters map[
 	// Query memos
 	query := fmt.Sprintf(`
 		SELECT 
-			memo_id, user_id, user_name, title, audio_url, text, duration_seconds,
+			memo_id, user_id, user_name, user_color, title, audio_url, text, duration_seconds,
 			latitude, longitude, location_accuracy, address, park_name,
 			created_at, updated_at
 		FROM memos
@@ -178,6 +179,7 @@ func (r *MemoRepository) List(ctx context.Context, page, limit int, filters map[
 			MemoID:          m.MemoID,
 			UserID:          m.UserID,
 			UserName:        m.UserName,
+			UserColor:       m.UserColor,
 			Title:           m.Title,
 			AudioURL:        m.AudioURL,
 			Text:            m.Text,
@@ -290,7 +292,7 @@ func (r *MemoRepository) SearchByText(ctx context.Context, query string, page, l
 	// Search query
 	searchQuery := `
 		SELECT 
-			memo_id, user_id, user_name, title, audio_url, text, duration_seconds,
+			memo_id, user_id, user_name, user_color, title, audio_url, text, duration_seconds,
 			latitude, longitude, location_accuracy, address, park_name,
 			created_at, updated_at,
 			ts_rank(to_tsvector('english', text), plainto_tsquery('english', $1)) as rank
@@ -312,7 +314,7 @@ func (r *MemoRepository) SearchByText(ctx context.Context, query string, page, l
 		var rank float64
 
 		if err := rows.Scan(
-			&m.MemoID, &m.UserID, &m.UserName, &m.Title, &m.AudioURL, &m.Text,
+			&m.MemoID, &m.UserID, &m.UserName, &m.UserColor, &m.Title, &m.AudioURL, &m.Text,
 			&m.DurationSeconds, &m.Latitude, &m.Longitude, &m.LocationAccuracy,
 			&m.Address, &m.ParkName, &m.CreatedAt, &m.UpdatedAt, &rank,
 		); err != nil {
@@ -334,6 +336,7 @@ func (r *MemoRepository) SearchByText(ctx context.Context, query string, page, l
 			MemoID:          m.MemoID,
 			UserID:          m.UserID,
 			UserName:        m.UserName,
+			UserColor:       m.UserColor,
 			Title:           m.Title,
 			AudioURL:        m.AudioURL,
 			Text:            m.Text,
@@ -353,12 +356,12 @@ func (r *MemoRepository) GetNearby(ctx context.Context, lat, lon float64, radius
 	// Haversine formula in SQL - use subquery to filter by distance
 	query := `
 		SELECT 
-			memo_id, user_name, title, park_name,
+			memo_id, user_name, user_color, title, park_name,
 			latitude, longitude, location_accuracy, address,
 			created_at, distance_meters
 		FROM (
 			SELECT 
-				memo_id, user_name, title, park_name,
+				memo_id, user_name, user_color, title, park_name,
 				latitude, longitude, location_accuracy, address,
 				created_at,
 				(
@@ -390,7 +393,7 @@ func (r *MemoRepository) GetNearby(ctx context.Context, lat, lon float64, radius
 		var address *string
 
 		if err := rows.Scan(
-			&nm.MemoID, &nm.UserName, &nm.Title, &nm.ParkName,
+			&nm.MemoID, &nm.UserName, &nm.UserColor, &nm.Title, &nm.ParkName,
 			&lat, &lon, &accuracy, &address,
 			&nm.CreatedAt, &nm.DistanceMeters,
 		); err != nil {

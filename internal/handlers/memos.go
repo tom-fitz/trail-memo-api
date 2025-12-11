@@ -133,6 +133,7 @@ func (h *MemoHandler) Create(c *gin.Context) {
 	memo := &models.Memo{
 		UserID:           userID,
 		UserName:         user.DisplayName,
+		UserColor:        user.Color,
 		Title:            req.Title,
 		AudioURL:         audioURL,
 		Text:             req.Text,
