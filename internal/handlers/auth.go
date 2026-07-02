@@ -14,13 +14,15 @@ import (
 // AuthHandler handles authentication-related requests
 type AuthHandler struct {
 	userRepo        *repository.UserRepository
+	approvedRepo    *repository.ApprovedUserRepository
 	firebaseService *services.FirebaseService
 }
 
 // NewAuthHandler creates a new auth handler
-func NewAuthHandler(userRepo *repository.UserRepository, firebaseService *services.FirebaseService) *AuthHandler {
+func NewAuthHandler(userRepo *repository.UserRepository, approvedRepo *repository.ApprovedUserRepository, firebaseService *services.FirebaseService) *AuthHandler {
 	return &AuthHandler{
 		userRepo:        userRepo,
+		approvedRepo:    approvedRepo,
 		firebaseService: firebaseService,
 	}
 }
@@ -89,6 +91,27 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// Enforce the sign-in allowlist
+	approved, err := h.approvedRepo.IsApproved(c.Request.Context(), firebaseUser.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Error checking approval status",
+			},
+		})
+		return
+	}
+	if !approved {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": gin.H{
+				"code":    "NOT_APPROVED",
+				"message": "This account is not approved. Contact your administrator.",
+			},
+		})
+		return
+	}
+
 	// Create user in database
 	user := &models.User{
 		UserID:      userID,
@@ -143,6 +166,27 @@ func (h *AuthHandler) GetMe(c *gin.Context) {
 			"error": gin.H{
 				"code":    "NOT_FOUND",
 				"message": "User not found",
+			},
+		})
+		return
+	}
+
+	// Users removed from the allowlist are locked out at next launch
+	approved, err := h.approvedRepo.IsApproved(c.Request.Context(), user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Error checking approval status",
+			},
+		})
+		return
+	}
+	if !approved {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": gin.H{
+				"code":    "NOT_APPROVED",
+				"message": "This account is not approved. Contact your administrator.",
 			},
 		})
 		return

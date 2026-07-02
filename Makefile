@@ -26,15 +26,15 @@ clean: ## Clean build artifacts
 	rm -rf dist/
 
 migrate: ## Run database migrations
-	@if [ -z "$(DATABASE_PUBLIC_URL)" ]; then \
+	@if [ -z "$(DATABASE_URL)" ]; then \
 		echo "Error: DATABASE_URL environment variable is not set"; \
 		exit 1; \
 	fi
-	@echo "DATABASE_URL: $(DATABASE_PUBLIC_URL)"
+	@echo "DATABASE_URL: $(DATABASE_URL)"
 	@echo "🗄️  Running database migrations..."
 	@for file in migrations/*.sql; do \
 		echo "  📄 Applying $$file..."; \
-		psql $(DATABASE_PUBLIC_URL) -f $$file || exit 1; \
+		psql $(DATABASE_URL) -f $$file || exit 1; \
 	done
 	@echo "✅ All migrations applied successfully!"
 

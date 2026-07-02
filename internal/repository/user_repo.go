@@ -48,7 +48,7 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 func (r *UserRepository) GetByID(ctx context.Context, userID string) (*models.User, error) {
 	var user models.User
 	query := `
-		SELECT user_id, email, display_name, department, color, created_at
+		SELECT user_id, email, display_name, department, color, is_admin, created_at
 		FROM users
 		WHERE user_id = $1
 	`
@@ -68,7 +68,7 @@ func (r *UserRepository) GetByID(ctx context.Context, userID string) (*models.Us
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 	query := `
-		SELECT user_id, email, display_name, department, color, created_at
+		SELECT user_id, email, display_name, department, color, is_admin, created_at
 		FROM users
 		WHERE email = $1
 	`

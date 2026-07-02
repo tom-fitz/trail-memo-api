@@ -45,10 +45,12 @@ func main() {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
 	memoRepo := repository.NewMemoRepository(db)
+	approvedRepo := repository.NewApprovedUserRepository(db)
 
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandler()
-	authHandler := handlers.NewAuthHandler(userRepo, firebaseService)
+	authHandler := handlers.NewAuthHandler(userRepo, approvedRepo, firebaseService)
+	adminHandler := handlers.NewAdminHandler(approvedRepo)
 	memoHandler := handlers.NewMemoHandler(memoRepo, userRepo, firebaseService, cfg.MaxUploadSize)
 
 	// Set up Gin router
@@ -82,6 +84,15 @@ func main() {
 			memos.GET("/:id", memoHandler.GetByID)
 			memos.PUT("/:id", memoHandler.Update)
 			memos.DELETE("/:id", memoHandler.Delete)
+		}
+
+		// Admin routes (allowlist management)
+		admin := v1.Group("/admin")
+		admin.Use(middleware.AuthMiddleware(firebaseService), middleware.AdminMiddleware(userRepo))
+		{
+			admin.GET("/approved-users", adminHandler.ListApprovedUsers)
+			admin.POST("/approved-users", adminHandler.AddApprovedUser)
+			admin.DELETE("/approved-users", adminHandler.RemoveApprovedUser)
 		}
 	}
 
