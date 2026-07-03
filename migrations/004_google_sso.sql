@@ -9,6 +9,6 @@ CREATE TABLE IF NOT EXISTS approved_users (
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Bootstrap (manual, one time):
---   INSERT INTO approved_users (email) VALUES ('<your-google-email>');
+--   INSERT INTO approved_users (email) VALUES ('tpfitz42@gmail.com');
 --   -- after that account's first Google sign-in:
---   UPDATE users SET is_admin = TRUE WHERE email = '<your-google-email>';
+--   UPDATE users SET is_admin = TRUE WHERE email = 'tpfitz42@gmail.com';
